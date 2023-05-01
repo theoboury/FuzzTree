@@ -21,8 +21,6 @@ The tool uses the following non-standard libraries:
 ### Files and repositories
 The project is entirely available on the current archive. 
 
-For Target RNA graphs, the used graphs were downloaded at https://uqam-my.sharepoint.com/:u:/g/personal/reinharz_vladimir_uqam_ca/Eb9rc26hI-FPgBuRH8EHR3gByiQmcgCgMu6hAdlK0-EVyA?e=R9FocY (1.5 GB) for graph without near edges and at (TODO lien data (size GB)) for graphs with near edges. Our recommandation is to extract them respectively into the folders bigRNAstorage and bigRNAstoragenear
-
 The different files are:
 * FuzzTree.py: core of the tool, search for Subgraph Isomorphism with neighborhoods.
 * VarnaDrawing.py: contains necessary wrappers to launch Varna on graphs and their mapping.
