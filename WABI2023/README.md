@@ -126,7 +126,7 @@ Here are the different options that can be added, none of them is necessary and 
 --timeout, default 108000 for each small graphs and 2000 for subparts of big graphs, the maximum time in seconds that we allow for the computation on each instance. (subgraphs of big graphs count as 1 instance)
 --pattern, default 20kink_turninto5TBW, the pattern from which launch computation that serves in FuzzTree or as origin of the cartography.
 --target, default 3NVI, the target graph on which to search for the pattern.
---near, default True, if we consider the near edges or not.
+--near, default False, if we consider the near edges or not.
 --thresholdbigGT, default 500, the number of nucleotides above which we consider the graph as big and have to cut it in slices.
 --samples, default 1000, the number of samples that are drawn during FuzzTree method.
 --patterncut, default 5, the place where the backbone of pattern graph is cut.

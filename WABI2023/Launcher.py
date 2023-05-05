@@ -39,6 +39,11 @@ parser.add_argument('--patterncut', type=str, required=False)
 args = parser.parse_args()
 if args.task == "create_patterns_and_targets":
     print("Launching storage of Pattern and Target graphs!")
+
+    list_dir = ["ALLkinkturnpattern", "ALLkinkturntarget","ALLkinkturnpatternwithgaps", "ALLkinkturntargetwithgaps"]
+    for directory in list_dir:
+        if not os.path.isdir(directory):
+            os.mkdir(directory)
     csv_parse("kink_turn", -1, RNAstorage = "bigRNAstorage/", csvlocation = "RNAcsv/", pattern_place="ALLkinkturnpattern/", target_place ="ALLkinkturntarget/", withgaps = 0)
     print("Pattern and Target graphs partially extracted and stored!")
     csv_parse("kink_turn", -1, RNAstorage = "bigRNAstorage/", csvlocation = "RNAcsv/", pattern_place="ALLkinkturnpatternwithgaps/", target_place ="ALLkinkturntargetwithgaps/", withgaps = 1)
@@ -46,16 +51,16 @@ if args.task == "create_patterns_and_targets":
 if args.task == "launch_sanity_test":
     print("Launching a simple test of the FuzzTree method and of Varna visualization!")
     test_mapping("ALLkinkturnpattern/53kink_turninto3NVI.pickle", "bigRNAstorage/3NVI.nxpickle", L=10, E=4, G=20, maxGAPdistance=10, nb_samples=1000, D = 5, nb_procs = 1)
-    print("FuzzTree method is setted up!")
+    print("FuzzTree method is set up!")
     test_varna("SanityCheck","ALLkinkturnpattern/53kink_turninto3NVI.pickle", "bigRNAstorage/3NVI.nxpickle", show=1, output_format="png", L = 10, E = 4, G = 20, maxGAPdistance=10, nb_samples=1000, D = 5, nb_procs = 1)
     if os.path.isfile("VarnaMapping.png"):
-        print("FuzzTree method + Varna drawing are setted up! You can see SanityCheck.png for the mapping drawn with Varna.")
+        print("FuzzTree method + Varna drawing are set up! You can see SanityCheck.png for the mapping drawn with Varna.")
     else:
         print("No drawing as output, Varna is probably not set up yet.")
 if args.task == "launch_sanity_test_novarna":
-    print("Launching a simple test of the FuzzTree method and of Varna visualization!")
+    print("Launching a simple test of the FuzzTree method!")
     test_mapping("ALLkinkturnpattern/53kink_turninto3NVI.pickle", "bigRNAstorage/3NVI.nxpickle", L=10, E=4, G=20, maxGAPdistance=10, nb_samples=1000, D = 5, nb_procs = 1)
-    print("FuzzTree method is setted up!")
+    print("FuzzTree method is set up!")
 if args.task == "launch_fuzztree":
     if args.pattern:
         pattern = "ALLkinkturnpattern/" + args.pattern + ".pickle"
@@ -64,10 +69,9 @@ if args.task == "launch_fuzztree":
 
     rm_near = True
     GTlistfolder = "bigRNAstorage"
-    if args.near:
-        if int(args.near) == 0:
-            rm_near = False
-            GTlistfolder = "bigRNAstoragenear"
+    if args.near == "True":
+        rm_near = False
+        GTlistfolder = "bigRNAstoragenear"
     if args.target:
         target = GTlistfolder + "/" + args.target + ".nxpickle"
     else:
@@ -103,10 +107,9 @@ if args.task == "launch_varna_mapping":
 
     rm_near = True
     GTlistfolder = "bigRNAstorage"
-    if args.near:
-        if int(args.near) == 0:
-            rm_near = False
-            GTlistfolder = "bigRNAstoragenear"
+    if args.near == "True":
+        rm_near = False
+        GTlistfolder = "bigRNAstoragenear"
     if args.target:
         target = GTlistfolder + "/" + args.target + ".nxpickle"
     else:
@@ -141,10 +144,9 @@ if args.task == "launch_custom_test":
         pattern = "ALLkinkturnpattern/20kink_turninto5TBW.pickle"
     rm_near = True
     GTlistfolder = "bigRNAstorage"
-    if args.near:
-        if int(args.near) == 0:
-            rm_near = False
-            GTlistfolder = "bigRNAstoragenear"
+    if args.near == "True":
+        rm_near = False
+        GTlistfolder = "bigRNAstoragenear"
     threshold_bigGT = 500
     if args.thresholdbigGT:
         threshold_bigGT = int(args.thresholdbigGT)
@@ -189,10 +191,9 @@ if args.task == "compute_metrics_example":
     #Compute metrics, we recommand 32 procs to do that 
     near = True
     GTlistfolder = "bigRNAstorage"
-    if args.near:
-        if int(args.near) == 0:
-            near = False
-            GTlistfolder = "bigRNAstoragenear"
+    if args.near == "True":
+        near = False
+        GTlistfolder = "bigRNAstoragenear"
     if near:
         #We import the results that we have for the near computation after the FuzzTree method task "launch_custom_test"
         #Computation was launched on pattern 20kink_turninto5TBW on a distributed system for gain of time.
@@ -280,7 +281,7 @@ if args.task == "compute_new_motifs_mean_RMSD_example":
         new_li.append((liRMSD[k], li))
     print(new_li)
 if args.task == "plot_metrics_example":
-    if args.near:
+    if args.near == "True":
         #We import the results that we have after the postprocessing task "compute_metrics_example"
         from results_storage import postprocessresuwithnear
         resu = postprocessresuwithnear()
@@ -327,13 +328,13 @@ if args.task == "plot_metrics_example":
     ax1.set_facecolor(color='white')
     fig.set_facecolor(color='white')
     title = "Sensitivity and specificity of found mappings for the Kink Turn family"
-    if args.near:
+    if args.near == "True":
         title = "Sensitivity and specificity of found mappings for the Kink Turn family with near"
     plt.title(title)
     plt.savefig(title + '.png', format='png')
     plt.savefig(title + '.pdf', format='pdf')
 if args.task == "time_graphs_example":
-    if args.near:
+    if args.near == "True":
         entry_raw = [('1E7K', 1.4278004169464111, [[0.0, 0.175, 0.699]]), ('6HCT', 1.5956840515136719, [[0.0, 0.203, 0.762]]), ('5G4T', 1.6446595191955566, [[0.115, 0.115, 0.62]]), ('3NVI', 1.7362689971923828, [[0.518, 0.518, 1.0]]), ('3SIU', 2.3870444297790527, [[0.0, 0.184, 0.788]]), ('4BW0', 2.5716769695281982, [[0.181, 0.181, 0.663]]), ('1T0K', 3.274966239929199, [[0.128, 0.128, 0.557]]), ('3NMU', 3.298027753829956, [[0.257, 0.257, 1.0]]), ('5FJ4', 4.195765018463135, [[0.1, 0.1, 0.587]]), ('4C4W', 4.322925806045532, [[0.139, 0.139, 0.625]]), ('6HCT', 5.505043268203735, [[0.0, 0.157, 0.356], [0.0, 0.125, 0.42]]), ('5G4U', 5.8360772132873535, [[0.081, 0.081, 0.349], [0.096, 0.096, 0.295]]), ('2OZB', 6.400434494018555, [[0.0, 0.0, 0.0]]), ('5XTM', 8.633862018585205, [[0.0, 0.0, 1.0]]), ('5XTM', 8.646195411682129, [[0.0, 0.0, 0.0]]), ('5DCV', 9.876028060913086, [[0.0, 0.0, 1.0]]), ('1U63', 11.58642053604126, [[0.0, 0.0, 0.54]]), ('3SIV', 12.602856397628784, [[0.0, 0.0, 0.0], [0.0, 0.155, 0.671]]), ('5Y7M', 13.279045343399048, [[0.0, 0.0, 0.0]]), ('2HW8', 24.179459810256958, [[0.0, 0.0, 0.0]]), ('5D8H', 24.81542706489563, [[0.0, 0.125, 0.619]]), ('3U4M', 31.55271315574646, [[0.113, 0.113, 0.607]]), ('3Q3Z', 31.67681050300598, [[0.199, 0.199, 0.641]]), ('2VPL', 46.498624324798584, [[0.0, 0.0, 0.0]]), ('5FJC', 46.54033088684082, [[0.118, 0.118, 0.609]]), ('6UFM', 52.27826380729675, [[0.084, 0.084, 0.506]]), ('4LCK', 54.75152587890625, [[0.0, 0.222, 0.786]]), ('6DVK', 58.71999716758728, [[0.0, 0.0, 0.243]]), ('4AOB', 61.546157360076904, [[0.0, 0.0, 0.365]]), ('4KQY', 84.89300441741943, [[0.157, 0.157, 0.65]]), ('3RW6', 95.82019829750061, [[0.077, 0.077, 0.453]]), ('3V7E', 128.75165915489197, [[0.0, 0.0, 0.529]]), ('6UFG', 271.3213586807251, [[0.094, 0.094, 0.515]]), ('6UFH', 360.8544452190399, [[0.251, 0.251, 0.767]]), ('4GXY', 366.75551652908325, [[0.228, 0.228, 0.746]]), ('2R8S', 533.8074650764465, [[0.0, 0.0, 0.0]]), ('1U6B', 1053.009474515915, [[0.0, 0.0, 0.0]]), ('6SY6', 1612.3541376590729, [[0, 0, 0]]), ('6SY4', 2101.450353384018, [[0, 0, 0]])]
         filestorage = "Timegraphbrut/timewithnear"
         name = "Time graph FuzzTree method with near "
@@ -342,8 +343,8 @@ if args.task == "time_graphs_example":
         filestorage = "Timegraphbrut/timewithoutnear"
         name = "Time graph FuzzTree method "
     entry = []
-    for (name, time, prop) in entry_raw:
-        entry.append((name, time, "smallRNA"))
+    for (namer, time, prop) in entry_raw:
+        entry.append((namer, time, "smallRNA"))
     li_big_RNA = ["blub", "4LFB", "4V9F", "4V88", "4WF9", "5J7L", "5TBW", "6CZR", "7A0S", "7RQB"]
     for i in range(1, 10):
         booleen = 1
@@ -360,12 +361,15 @@ if args.task == "time_graphs_example":
             val+= num
         entry.append((li_big_RNA[i], val, "bigRNA"))
     small1 = [(i,j) for (i, j, k) in entry if k == "smallRNA"]
-    cut = (len(small1) + 1)/2
-    small2 = [elem for k, elem in enumerate(small1) if k >= cut]
-    small1 = [elem for k, elem in enumerate(small1) if k < cut]
-    bar_graph_time_by_filename(small1, name + "part 1 out of 3", bar_length = 0.3)
-    bar_graph_time_by_filename(small2, name + "part 2 out of 3", bar_length = 0.3)
-    bar_graph_time_by_filename([(i,j) for (i, j, k) in entry if k == "bigRNA"], name + "with slicing in sphere part 3 out of 3", bar_length = 0.3)
+    cut1 = (len(small1) + 1)/3
+    cut2 = (2*len(small1) + 1)/3
+    small2 = [elem for k, elem in enumerate(small1) if k >= cut1 and k < cut2]
+    small3 = [elem for k, elem in enumerate(small1) if k >= cut2]
+    small1 = [elem for k, elem in enumerate(small1) if k < cut1]
+    bar_graph_time_by_filename(small1, name + "part 1 out of 4", bar_length = 0.3)
+    bar_graph_time_by_filename(small2, name + "part 2 out of 4", bar_length = 0.3)
+    bar_graph_time_by_filename(small3, name + "part 3 out of 4", bar_length = 0.3)
+    bar_graph_time_by_filename([(i,j) for (i, j, k) in entry if k == "bigRNA"], name + "with slicing in sphere part 4 out of 4", bar_length = 0.3)
 if args.task == "connexity_graphs_creation_example":
     #Return connexity list with near
     #We import the results that we have for the near computation after the postprocessing task "compute_metrics_example"

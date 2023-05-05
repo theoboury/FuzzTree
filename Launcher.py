@@ -88,9 +88,8 @@ pattern = args.pattern
 target = args.target 
 
 rm_near = True
-if args.near:
-    if int(args.near) == 0:
-        rm_near = False
+if args.near == "True":
+    rm_near = False
 
 L = 20
 E = 4

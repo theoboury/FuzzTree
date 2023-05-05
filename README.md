@@ -104,7 +104,7 @@ Neighborhood Thresholds and parameters:
 
 Others:
 --procs, default 1, the number of processors on which we want to work, only serve for preprocessing here.
---near, default True, if we consider the near edges or not.
+--near, default False, if we consider the near edges or not.
 --usevarna, default False, if we want to use Varna or not for a single query.
 
 
