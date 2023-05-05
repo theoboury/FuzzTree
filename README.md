@@ -39,9 +39,7 @@ export PATHTOCONDA=Your_path_to_conda/conda
 First init conda :
 
 ```bash
-conda activate fish
-conda config --set auto_activate_base False
-ln -s your/path/to/conda/conda conda
+conda init fish
 ```
 
 It is not a mandatory for our method, but in order to obtain some mapping visualisations, we used Varna from VARNA: Interactive drawing and editing of the RNA secondary structure, Darty et al, Bioinformatics, 2009 that can be installed at https://varna.lri.fr/index.php?lang=en&page=downloads&css=varna

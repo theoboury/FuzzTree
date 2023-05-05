@@ -2,6 +2,7 @@
 # Copyright (C) 2023 THEO BOURY 
 
 import csv
+import os
 import time
 import pickle
 import argparse
@@ -115,7 +116,11 @@ if args.Dgap:
 
 if args.usevarna:
     test_varna("VarnaMapping", pattern, target, show=1, output_format="png",L=L, E=E, G=G, maxGAPdistance=Dgap, nb_samples=nb_samples, D = Dedge, nb_procs = nb_procs)
-    print("If computation worked, you can see VarnaMapping.png for the mapping drawn with Varna.")
+    if os.path.isfile("VarnaMapping.png"):
+        print("You can see VarnaMapping.png for the mapping drawn with Varna.")
+    else:
+        print("No drawing as output, Varna is probably not set up yet.")
+    
 else:
     mappings = test_mapping(pattern, target, L=L, E=E, G=G, maxGAPdistance=Dgap, nb_samples=nb_samples, D = Dedge, nb_procs = nb_procs)
     print("Found mappings", mappings)

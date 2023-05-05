@@ -1,5 +1,5 @@
 dependencies:
-	conda install -c conda-forge -c bioconda 'infrared' viennarna jupyter matplotlib pip networkx graphviz pygraphviz
+	conda install -y -c conda-forge -c bioconda 'infrared' viennarna jupyter matplotlib pip networkx graphviz pygraphviz
 	pip install varnaapi
 	pip install func_timeout
 tests:

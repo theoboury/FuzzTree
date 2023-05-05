@@ -2,6 +2,7 @@
 # Copyright (C) 2023 THEO BOURY 
 
 import csv
+import os
 import pickle
 import argparse
 import matplotlib.pyplot as plt
@@ -47,7 +48,10 @@ if args.task == "launch_sanity_test":
     test_mapping("ALLkinkturnpattern/53kink_turninto3NVI.pickle", "bigRNAstorage/3NVI.nxpickle", L=10, E=4, G=20, maxGAPdistance=10, nb_samples=1000, D = 5, nb_procs = 1)
     print("FuzzTree method is setted up!")
     test_varna("SanityCheck","ALLkinkturnpattern/53kink_turninto3NVI.pickle", "bigRNAstorage/3NVI.nxpickle", show=1, output_format="png", L = 10, E = 4, G = 20, maxGAPdistance=10, nb_samples=1000, D = 5, nb_procs = 1)
-    print("FuzzTree method + Varna drawing are setted up! You can see SanityCheck.png for the mapping drawn with Varna.")
+    if os.path.isfile("VarnaMapping.png"):
+        print("FuzzTree method + Varna drawing are setted up! You can see SanityCheck.png for the mapping drawn with Varna.")
+    else:
+        print("No drawing as output, Varna is probably not set up yet.")
 if args.task == "launch_sanity_test_novarna":
     print("Launching a simple test of the FuzzTree method and of Varna visualization!")
     test_mapping("ALLkinkturnpattern/53kink_turninto3NVI.pickle", "bigRNAstorage/3NVI.nxpickle", L=10, E=4, G=20, maxGAPdistance=10, nb_samples=1000, D = 5, nb_procs = 1)
