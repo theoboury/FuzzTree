@@ -16,14 +16,15 @@ clean:
 	rm -f *.pdf
 	rm -f carte1.csv
 	rm -f eRMSD_distribution.csv
-		
+	rm temp_kink_pdb.txt
 clean_all:
 	rm -f *.png
 	rm -R -f __pycache__
 	rm -f *.pdf
 	rm -f carte1.csv
 	rm -f eRMSD_distribution.csv
-	rm ALLkinkturnpattern 
-	rm ALLkinkturntarget
-	rm ALLkinkturnpatternwithgaps
-	rm ALLkinkturntargetwithgaps
+	rm -r ALLkinkturnpattern 
+	rm -r ALLkinkturntarget
+	rm -r ALLkinkturnpatternwithgaps
+	rm -r ALLkinkturntargetwithgaps
+	rm temp_kink_pdb.txt

@@ -3,7 +3,7 @@
 
 # FuzzTree Project
 
-This project present FuzzTree, a new tool to solve the Subgraph Isomorphism Problem in its "Fuzzy" version, that allows to take into account and search for neighborhoods of the requested pattern.
+This project presents FuzzTree, a new tool to solve the Subgraph Isomorphism Problem in its "Fuzzy" version, that allows to take into account and search for neighborhoods of a requested pattern.
 
 ## Scope of this folder
 
@@ -52,7 +52,7 @@ make dependencies
 ```
 
 
-You can now launch the test by using, it will launch the test with pattern graph 53kink_turninto3NVI.pickle and target graph 3NVI.nxpickle: 
+You can now launch the test by using one of the following commands, it will launch the test with pattern graph 53kink_turninto3NVI.pickle and target graph 3NVI.nxpickle: 
 
 ```bash
 make tests
@@ -67,8 +67,8 @@ If no mistake appears here, you are good to go.
 
 #### Input and output format
 
-Input and output should be respectively a .pickle file and a .nxpickle file that described the pattern and the target graphs.
-We advise to have the nucleotides in the .pickle graph to be nmerote from 1 to |PATTERN| in order to have a clean mapping and drawing as output.
+Input and output should be respectively a .pickle file and a .nxpickle file that describe the pattern and the target graphs.
+We advise to have the nucleotides in the .pickle graph to be numbered from 1 to |PATTERN| in order to have a clean mapping and drawing as output.
 
 #### Output format
 
@@ -103,14 +103,14 @@ Neighborhood Thresholds and parameters:
 --samples, default 1000, the number of samples that are drawn during FuzzTree method.
 
 Others:
---procs, default 1, the number of processors on which we want to work, only serve for preprocessing here.
+--procs, default 1, the number of processors on which we want to work, only serves for preprocessing here.
 --near, default False, if we consider the near edges or not.
 --usevarna, default False, if we want to use Varna or not for a single query.
 
 
 ## Limitations
 
-* In FuzzTree method, the set_target was put at a mean value of threshold over two, which favors to find quickly graphs with a bit of ``fuzziness", if for others usages focus is put on the usage for no fuzziness or high fuzziness it can be relevant to change this value, which should be done manually in this release by editing the FuzzTree.py file.
+* In the FuzzTree method, the set_target was put at a mean value of threshold over two, which favors to find quickly graphs with a bit of ``fuzziness". For others uses, if you want to focus on motifs with no fuzziness or high fuzziness, it can be relevant to change this value. It should be done manually in this release by editing the FuzzTree.py file.
 
 ## Contributors
 
