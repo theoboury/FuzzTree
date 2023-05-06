@@ -490,3 +490,66 @@ if args.task == "connexity_graphs_creation_with_pdb_example":
             connex_graphs.append(pdb_connex.copy())
         connex_by_RNA.append((RNA, connex_graphs.copy()))
     print("\nconnex_by_RNA_with_pdb", connex_by_RNA)
+
+if args.task == "connexity_graphs_creation_with_pdb_example_kink_turn":
+    #same but with pdb
+    #We import the results that we have for the near computation after the postprocessing task "compute_metrics_example"        
+    from results_storage import postprocessresuwithnear
+    perfect_mapping = csv_parse("kink_turn", -1)
+    resu = postprocessresuwithnear()[1:]
+    new_resu = []
+    for (RNA, chains, (blub1, blub2, blub3, blub4, blub5, mappings)) in resu:
+        new_resu_loc = []
+        loc_perfect_mapping = [perfect_mapping[i] for i in range(len(perfect_mapping)) if perfect_mapping[i][0] in [RNA]]
+        local_nodes_pdb = []
+        with open("bigRNAstorage/" + RNA + ".nxpickle",'rb') as f:
+            G = pickle.load(f)
+        for (blub, li) in loc_perfect_mapping:
+            for (a,(i,j)) in li:
+                b = [(ii, jj) for ((ii,jj), tt) in G.nodes.data() if ii == i and tt['pdb_position'] == j][0]
+                local_nodes_pdb.append(b)
+        for mapp in mappings:
+            booleen = 1
+            for (a,b) in mapp:
+                if b in local_nodes_pdb:
+                    booleen = 0
+                    break
+            if not booleen:
+                new_resu_loc.append(mapp)
+        new_resu.append((RNA, new_resu_loc.copy()))
+    def purge(li, elem_li):
+        new_li = li.copy()
+        for elem in elem_li:
+            ind = new_li.index(elem)
+            new_li = new_li[:ind] + new_li[(ind + 1):]
+        return new_li
+    connex_by_RNA = []
+    for (RNA, mapping) in new_resu:
+        with open("bigRNAstorage/" + RNA + ".nxpickle",'rb') as f:
+            G = pickle.load(f)  
+        mapping_unfold = []
+        for mapp in mapping:
+            for (num,e) in mapp:
+                if e not in mapping_unfold:
+                    mapping_unfold.append(e)  
+        connex_graphs = []
+        while mapping_unfold:
+            elem = mapping_unfold[0]
+            mapping_unfold = purge(mapping_unfold, [elem])
+            new_connex = [elem]
+            old_connex = []
+            while new_connex != old_connex:
+                old_connex = new_connex.copy()
+                for elem1 in new_connex:
+                    pred = [i for i in G.predecessors(elem1)]
+                    predsucc = pred + [i for i in G.successors(elem1) if i not in pred]
+                    adj = [e for e in predsucc if e in mapping_unfold and e not in new_connex]
+                    mapping_unfold = purge(mapping_unfold, adj)
+                    new_connex += adj
+            pdb_connex = []
+            for (i_m, j_m) in new_connex:
+                b_m = [(ii, tt['pdb_position']) for ((ii,jj), tt) in G.nodes.data() if ii == i_m and jj == j_m][0]
+                pdb_connex.append(b_m)
+            connex_graphs.append(pdb_connex.copy())
+        connex_by_RNA.append((RNA, connex_graphs.copy()))
+    print("\nconnex_by_RNA_with_pdb", connex_by_RNA)
