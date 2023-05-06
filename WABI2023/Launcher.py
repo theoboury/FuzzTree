@@ -36,6 +36,8 @@ parser.add_argument('--Dedge', type=str, required=False)
 parser.add_argument('--Dgap', type=str, required=False)
 parser.add_argument('--samples', type=str, required=False)
 parser.add_argument('--patterncut', type=str, required=False)
+parser.add_argument('--overlapkinkturn', type=str, required=False)
+
 args = parser.parse_args()
 if args.task == "create_patterns_and_targets":
     print("Launching storage of Pattern and Target graphs!")
@@ -264,6 +266,7 @@ if args.task == "draw_cartography_example":
     print("nb_kink_turns_not_cartografied", nb) 
     plot = sns.pairplot(data=carte, hue="Family")
     fig = plot.fig
+    print("You can have a look at the cartography at Kink_Turns_cartography.png/pdf.") 
     plt.savefig("Kink_Turns_cartography"+ '.png', format='png')
     plt.savefig("Kink_Turns_cartography"+ '.pdf', format='pdf')
 if args.task == "compute_new_motifs_RMSD_example":
@@ -327,12 +330,16 @@ if args.task == "plot_metrics_example":
             offset = offset + 11
     ax1.set_facecolor(color='white')
     fig.set_facecolor(color='white')
-    title = "Sensitivity and specificity of found mappings for the Kink Turn family"
+    title = "Sensitivity_and_specificity_of_found_mappings_for_the_Kink_Turn_family"
     if args.near == "True":
-        title = "Sensitivity and specificity of found mappings for the Kink Turn family with near"
+        title = "Sensitivity_and_specificity_of_found_mappings_for_the_Kink_Turn_family_with_near"
     plt.title(title)
     plt.savefig(title + '.png', format='png')
     plt.savefig(title + '.pdf', format='pdf')
+    if args.near == "True":
+        print("You can have a look at the result at Sensitivity_and_specificity_of_found_mappings_for_the_Kink_Turn_family_with_near.png/pdf.") 
+    else:
+        print("You can have a look at the result at Sensitivity_and_specificity_of_found_mappings_for_the_Kink_Turn_family.png/pdf.") 
 if args.task == "time_graphs_example":
     if args.near == "True":
         entry_raw = [('1E7K', 1.4278004169464111, [[0.0, 0.175, 0.699]]), ('6HCT', 1.5956840515136719, [[0.0, 0.203, 0.762]]), ('5G4T', 1.6446595191955566, [[0.115, 0.115, 0.62]]), ('3NVI', 1.7362689971923828, [[0.518, 0.518, 1.0]]), ('3SIU', 2.3870444297790527, [[0.0, 0.184, 0.788]]), ('4BW0', 2.5716769695281982, [[0.181, 0.181, 0.663]]), ('1T0K', 3.274966239929199, [[0.128, 0.128, 0.557]]), ('3NMU', 3.298027753829956, [[0.257, 0.257, 1.0]]), ('5FJ4', 4.195765018463135, [[0.1, 0.1, 0.587]]), ('4C4W', 4.322925806045532, [[0.139, 0.139, 0.625]]), ('6HCT', 5.505043268203735, [[0.0, 0.157, 0.356], [0.0, 0.125, 0.42]]), ('5G4U', 5.8360772132873535, [[0.081, 0.081, 0.349], [0.096, 0.096, 0.295]]), ('2OZB', 6.400434494018555, [[0.0, 0.0, 0.0]]), ('5XTM', 8.633862018585205, [[0.0, 0.0, 1.0]]), ('5XTM', 8.646195411682129, [[0.0, 0.0, 0.0]]), ('5DCV', 9.876028060913086, [[0.0, 0.0, 1.0]]), ('1U63', 11.58642053604126, [[0.0, 0.0, 0.54]]), ('3SIV', 12.602856397628784, [[0.0, 0.0, 0.0], [0.0, 0.155, 0.671]]), ('5Y7M', 13.279045343399048, [[0.0, 0.0, 0.0]]), ('2HW8', 24.179459810256958, [[0.0, 0.0, 0.0]]), ('5D8H', 24.81542706489563, [[0.0, 0.125, 0.619]]), ('3U4M', 31.55271315574646, [[0.113, 0.113, 0.607]]), ('3Q3Z', 31.67681050300598, [[0.199, 0.199, 0.641]]), ('2VPL', 46.498624324798584, [[0.0, 0.0, 0.0]]), ('5FJC', 46.54033088684082, [[0.118, 0.118, 0.609]]), ('6UFM', 52.27826380729675, [[0.084, 0.084, 0.506]]), ('4LCK', 54.75152587890625, [[0.0, 0.222, 0.786]]), ('6DVK', 58.71999716758728, [[0.0, 0.0, 0.243]]), ('4AOB', 61.546157360076904, [[0.0, 0.0, 0.365]]), ('4KQY', 84.89300441741943, [[0.157, 0.157, 0.65]]), ('3RW6', 95.82019829750061, [[0.077, 0.077, 0.453]]), ('3V7E', 128.75165915489197, [[0.0, 0.0, 0.529]]), ('6UFG', 271.3213586807251, [[0.094, 0.094, 0.515]]), ('6UFH', 360.8544452190399, [[0.251, 0.251, 0.767]]), ('4GXY', 366.75551652908325, [[0.228, 0.228, 0.746]]), ('2R8S', 533.8074650764465, [[0.0, 0.0, 0.0]]), ('1U6B', 1053.009474515915, [[0.0, 0.0, 0.0]]), ('6SY6', 1612.3541376590729, [[0, 0, 0]]), ('6SY4', 2101.450353384018, [[0, 0, 0]])]
@@ -451,70 +458,9 @@ if args.task == "connexity_graphs_creation_with_pdb_example":
                 if b in local_nodes_pdb:
                     booleen = 0
                     break
+            if args.overlapkinkturn == "True":
+                booleen = not booleen
             if booleen:
-                new_resu_loc.append(mapp)
-        new_resu.append((RNA, new_resu_loc.copy()))
-    def purge(li, elem_li):
-        new_li = li.copy()
-        for elem in elem_li:
-            ind = new_li.index(elem)
-            new_li = new_li[:ind] + new_li[(ind + 1):]
-        return new_li
-    connex_by_RNA = []
-    for (RNA, mapping) in new_resu:
-        with open("bigRNAstorage/" + RNA + ".nxpickle",'rb') as f:
-            G = pickle.load(f)  
-        mapping_unfold = []
-        for mapp in mapping:
-            for (num,e) in mapp:
-                if e not in mapping_unfold:
-                    mapping_unfold.append(e)  
-        connex_graphs = []
-        while mapping_unfold:
-            elem = mapping_unfold[0]
-            mapping_unfold = purge(mapping_unfold, [elem])
-            new_connex = [elem]
-            old_connex = []
-            while new_connex != old_connex:
-                old_connex = new_connex.copy()
-                for elem1 in new_connex:
-                    pred = [i for i in G.predecessors(elem1)]
-                    predsucc = pred + [i for i in G.successors(elem1) if i not in pred]
-                    adj = [e for e in predsucc if e in mapping_unfold and e not in new_connex]
-                    mapping_unfold = purge(mapping_unfold, adj)
-                    new_connex += adj
-            pdb_connex = []
-            for (i_m, j_m) in new_connex:
-                b_m = [(ii, tt['pdb_position']) for ((ii,jj), tt) in G.nodes.data() if ii == i_m and jj == j_m][0]
-                pdb_connex.append(b_m)
-            connex_graphs.append(pdb_connex.copy())
-        connex_by_RNA.append((RNA, connex_graphs.copy()))
-    print("\nconnex_by_RNA_with_pdb", connex_by_RNA)
-
-if args.task == "connexity_graphs_creation_with_pdb_example_kink_turn":
-    #same but with pdb
-    #We import the results that we have for the near computation after the postprocessing task "compute_metrics_example"        
-    from results_storage import postprocessresuwithnear
-    perfect_mapping = csv_parse("kink_turn", -1)
-    resu = postprocessresuwithnear()[1:]
-    new_resu = []
-    for (RNA, chains, (blub1, blub2, blub3, blub4, blub5, mappings)) in resu:
-        new_resu_loc = []
-        loc_perfect_mapping = [perfect_mapping[i] for i in range(len(perfect_mapping)) if perfect_mapping[i][0] in [RNA]]
-        local_nodes_pdb = []
-        with open("bigRNAstorage/" + RNA + ".nxpickle",'rb') as f:
-            G = pickle.load(f)
-        for (blub, li) in loc_perfect_mapping:
-            for (a,(i,j)) in li:
-                b = [(ii, jj) for ((ii,jj), tt) in G.nodes.data() if ii == i and tt['pdb_position'] == j][0]
-                local_nodes_pdb.append(b)
-        for mapp in mappings:
-            booleen = 1
-            for (a,b) in mapp:
-                if b in local_nodes_pdb:
-                    booleen = 0
-                    break
-            if not booleen:
                 new_resu_loc.append(mapp)
         new_resu.append((RNA, new_resu_loc.copy()))
     def purge(li, elem_li):

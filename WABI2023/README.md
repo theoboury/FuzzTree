@@ -130,7 +130,7 @@ Here are the different options that can be added, none of them is necessary and 
 --thresholdbigGT, default 500, the number of nucleotides above which we consider the graph as big and have to cut it in slices.
 --samples, default 1000, the number of samples that are drawn during FuzzTree method.
 --patterncut, default 5, the place where the backbone of pattern graph is cut.
-
+--overlapkinkturn, default False, if we consider only the mappings that overlaps Kink-Turns or the ones that have no overlap with the Kink-Turns.
 ## Different examples of codes
 
 Here is the list of the different tasks that can be launched using the Launcher.py to reproduce our tests and computations:
@@ -166,7 +166,7 @@ Used parameters: None.
 Used parameters: None.
 
 --task connexity_graphs_creation_with_pdb_example, same task but with pdb numbers in the results instaed of local numerotations.
-Used parameters: None.
+Used parameters: overlapkinkturn.
 
 --task compute_new_motifs_RMSD_example, compute the RMSDs between Kink-Turns and the new found motifs as connex graphs, as obtained after connexity_graphs_creation_example/connexity_graphs_creation_with_pdb_example tasks.
 Used parameters: None.
