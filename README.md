@@ -7,13 +7,14 @@ This project presents FuzzTree, a new tool to solve the Subgraph Isomorphism Pro
 
 ## Scope of this folder
 
-This folder contains all the elements to launch the FuzzTree tool in its minimalistic version described in (TODO lien arXiV?) by Boury et al, 2023. Specific benchmarks and frameworks including the cartography example and test on multiple graphs are available in the WABI 2023 folder. README in WABI 2023 is specifically design to indicate what all the possible tests are.
+This folder contains all the elements to launch the FuzzTree tool in its minimalistic version described in [Automatic exploration of the natural variability of RNA non-canonical geometric patterns with a parameterized sampling technique](https://cnrs.hal.science/hal-04094288/) by Boury et al, 2023. Specific benchmarks and frameworks including the cartography example and test on multiple graphs are available in the WABI 2023 folder. README in WABI 2023 is specifically design to indicate what all the possible tests are.
 ## Prerequisite and launch
 
 ### Dependencies 
 The tool uses the following non-standard libraries:
 
-* infrared (see https://hal.archives-ouvertes.fr/hal-03711828/document by Hua-Ting Yao et al, 2022 for more details.)
+* infrared (see [Developing complex RNA design applications in the
+Infrared framework](https://hal.archives-ouvertes.fr/hal-03711828/document) by Hua-Ting Yao et al, 2022 for more details.)
 * pickle (for graph imports). (natively installed for python above 3.7 ?)
 * networkx (for graph vizualizations).
 * varnaapi (for graph vizualizations). 
