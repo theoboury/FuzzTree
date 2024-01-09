@@ -1,10 +1,3 @@
-TODO : have zip files or link to bigRNAstorage(near) datas.
-TODO : add somewhere Vladimir's script to create the pdb files from connex list.
-TODO : how should we handle Varna and RNAalign shold the executable be present or not and how to credit them ? a citer dans le readme et le papier trouver un endroit où placer varna
-TODO : update README , introduce a limitation on the set target quickly and explain that it neededs a filter (already done the filter), put a warning about loading on some results if the RAM is not suffisant python ca refuse to load it and "stop the process"
-TODO: test the code in a new folder with none of the pattern/target folder built
-TODO : separer en 2 folders un avec le tool général et un WABI 2023 avec nos benchs qui ressemblent au dossier dans l'état actuel. 
-
 # FuzzTree
 # Copyright (C) 2023 THEO BOURY 
 
