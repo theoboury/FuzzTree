@@ -37,7 +37,7 @@ def draw_varna(GT, nodes_target, mapping):
         - Return GT graph with mapping drawn in red using VARNA.
     """
     secondary_structures = [(nodes_target.index(i), nodes_target.index(j)) for (i, j, t) in GT.edges.data() if t['label'] == "CWW"]
-    noncanonicaledges = [(nodes_target.index(i), nodes_target.index(j), t['label']) for (i, j, t) in GT.edges.data() if (nodes_target.index(i), nodes_target.index(j)) not in secondary_structures if t['label'] !='B53']
+    noncanonicaledges = [(nodes_target.index(i), nodes_target.index(j), t['label']) for (i, j, t) in GT.edges.data() if (nodes_target.index(i), nodes_target.index(j)) not in secondary_structures if t['label'] !='B53' and t['label'] !='artificialB53']
     sequence  = []
     if nodes_target != []:
         strain = nodes_target[0][0]

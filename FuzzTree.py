@@ -12,38 +12,6 @@ from multiprocessing import Pool
 DEBUG = 0
 infinite = 100
 
-def check(GP, GT, Mapping, L, E, G, D, IDI_matrix, Distancer):
-    """ 
-    Input : - Pattern and target graphs GP and GT
-            - Fuzzy thresholds L, E, G, D
-            - A mapping found in GT for GP
-            - IDI_matrix for label isostericity computation and Distancer that stores distances between edges of GT.
-    Output : Returns 1 if the Mapping is admissible and respects all of the fuzzy thresholds and 0 otherwise.
-    """
-    list_edges_GT = list(GT.edges())
-    mapped = {}
-    for (i, j) in Mapping:
-        mapped[i] = j
-    sum_label = 0
-    sum_edge_missing = 0
-    sum_dist_gap = 0
-    for (i, j, t) in GP.edges.data():
-        if (mapped[i], mapped[j]) not in list_edges_GT:
-            if t['label'] == 'B53':
-                return 0
-            if Distancer(mapped[i], mapped[j]) > D:
-                return 0
-            sum_edge_missing+=1
-        else:
-            (ii, jj, tt) = [(ii, jj, tt) for (ii, jj, tt) in GT.edges.data() if ii == mapped[i] and jj == mapped[j]][0]
-            if t['label'] != tt['label'] and (t['label'] == 'B53' or tt['label'] == 'B53'): #To avoid problem with B53 not in IDI matrix
-                return 0
-            elif t['label'] != tt['label']:
-                sum_label += IDI_matrix[t['label']][tt['label']]
-            sum_dist_gap += tt['dist'] #Can be done in any case as this label is set to 0 when it is not a "false" edge.
-    if (sum_label > L) or (sum_edge_missing > E) or (sum_dist_gap > G):
-        return 0
-    return 1
 
 def interaction_to_number(interact_char):
     """ 
@@ -51,7 +19,7 @@ def interaction_to_number(interact_char):
     Output : The corresponding index of this interaction in the Distance_matrix/ IDI_matrix 
             and -1 if it is a backbone.
     """
-    if interact_char == 'B53':
+    if interact_char == 'B53' or interact_char == 'artificialB53':
         return -1
     if interact_char[2] == 'W':
         interact_char = interact_char[0] + interact_char[2] + interact_char[1]
@@ -70,7 +38,7 @@ def augment_graph(GT, maxGapallowed, Distancer):
                 dist = D(i,j) - D(i, N_{B53}(i))
             * label "correspondant_nodes" that correspond to the list of shorcuted nodes. They will serve in the post procesing as shortcuted nodes must not be taken in mappings. 
     """
-    Gnew=nx.DiGraph() #Initiate the new GT graph.
+    Gnew=nx.MultiDiGraph() #Initiate the new GT graph.
     for (i,t) in GT.nodes.data():
         Gnew.add_node(i, atoms = t['atoms'])
     for (i,j,t) in GT.edges.data():
@@ -78,7 +46,7 @@ def augment_graph(GT, maxGapallowed, Distancer):
     for node in GT.nodes():
         iter_node = node
         correspondant_nodes = []
-        B53_neighbors=[n for n in GT.successors(iter_node) if GT[iter_node][n]['label'] == 'B53']
+        B53_neighbors=[n for n in GT.successors(iter_node) if len([blub for blub in range(len(GT[iter_node][n])) if GT[iter_node][n][blub]['label'] == 'B53']) > 0]
         if len(B53_neighbors) > 1: #It means that two backbones start from iter_node, which is not biologically admissible.
             print("THE WORLD BLOWS UP")
         if len(B53_neighbors) == 0: #It means that we are at the end of the strand already
@@ -90,7 +58,7 @@ def augment_graph(GT, maxGapallowed, Distancer):
 
         while dist < maxGapallowed: #We do not take into account nodes that are too far from the origin node. 
         #Can be replaced here by  "while dist - first_dist < maxGapallowed:", if we only want to take into account everything except the first gap distance.
-            B53_neighbors=[n for n in GT.successors(iter_node) if GT[iter_node][n]['label'] == 'B53']
+            B53_neighbors=[n for n in GT.successors(iter_node) if len([blub for blub in range(len(GT[iter_node][n])) if GT[iter_node][n][blub]['label'] == 'B53']) > 0]
             if len(B53_neighbors) > 1:
                 print("THE WORLD BLOWS UP")
             if len(B53_neighbors) == 0:
@@ -114,7 +82,12 @@ def filter(GP, GTaugment, mapping):
         for k2, (p2, t2) in enumerate(mapping):
             if k1 != k2:
                 if (p1, p2) in GP.edges() and (t1, t2) in GTaugment.edges():
-                    banned += GTaugment[t1][t2]['correspondant_nodes'] #If edges used in the mapped graph have correspondants, they must be unmapped.
+                    if len([blub for blub in range(len(GP[p1][p2])) if GP[p1][p2][blub]['label'] == 'B53']) > 0:
+                        liblub = [b for b in range(len(GTaugment[t1][t2])) if GTaugment[t1][t2][b]['label'] == 'B53']
+                        for blub in liblub:
+                            banned += GTaugment[t1][t2][blub]['correspondant_nodes']
+                    #for blub : #TODO: can probably be improve with info on edges
+                         #If edges used in the mapped graph have correspondants, they must be unmapped.
     banned = list(set(banned))
     GTmapped = [t for (_, t) in mapping]
     for b in banned:
@@ -198,19 +171,26 @@ def _EdgeRespect(x, y, label_edge_ij, nodes_target, edges_target, Distancer, E, 
     """
     Input : - Two nodes x and y from the GT respectively the mappings of i and j from the GP.
             - The list of the nodes in GT nodes_target to map the index of infrared functions with real names of nodes in the graph.
-            - The list of all edges in GT, edges_target.
+            - The list of all edges in GT with labels, edges_target.
             - Storage of the Target graph GT to compute distance.
             - E, the threshold on number of missing edges.
             - D, the maximum distance above which we do not consider edges that are missing
     Output : A value between 0 and +inf that indicates if the edge is present, returns 0 if it is the case, 1/E if it is absent and +inf if it is eliminatory
     """
+    #return 0
     if x == y: #Necessary condition of Injectivity : If neighbors are mapped to the same node in GT, we can already reject  
         return infinite
-    if (nodes_target[x], nodes_target[y]) in edges_target: #We check that this edge is present or not in GT
-        return 0
-    if E == 0 or label_edge_ij == 'B53' or (Distancer[nodes_target[x]][nodes_target[y]] > D):
+    if label_edge_ij == 'B53' or label_edge_ij == 'artificialB53':
+        if (nodes_target[x], nodes_target[y], label_edge_ij) in edges_target:
+            return 0
         return infinite
-    return 1
+    else:
+        edges = [l for (i, j, l) in edges_target if (i == nodes_target[x]) and (j == nodes_target[y]) and (l != 'B53' or l != 'artificialB53')]
+        if len(edges) > 0: #We check that this edge is present or not in GT
+            return 0
+        if E == 0 or (Distancer[nodes_target[x]][nodes_target[y]] > D):
+            return infinite
+        return 1
 
 
 def _LabelRespect(x, y, label_edge_ij, nodes_target, label_edge_target, edges_target, IDI_matrix):
@@ -223,15 +203,13 @@ def _LabelRespect(x, y, label_edge_ij, nodes_target, label_edge_target, edges_ta
             - A IDI Matrix giving distances between non-canonical interactions/labels (for instance the IDI matricx for isostericity distance).
     Output : A value between 0 and +inf that indicates  how much labels are close from each other.
     """
-    if (nodes_target[x], nodes_target[y]) in edges_target: #We check that this edge is present or not in GT as no label must be checked otherwise.
-        (xx, yy) = interaction_to_number(label_edge_ij), interaction_to_number(label_edge_target[edges_target.index((nodes_target[x], nodes_target[y]))])  #Convert canonical labels to numbers.
-        if xx == yy: #it includes the case where xx == yy == -1.
-            return 0 
-        if xx == -1 or yy == -1:
-            return infinite #Backbone is replaced by something else, it is eliminatory.
-        return IDI_matrix[xx][yy] 
-    return 0 #Nothing to add if we do not talk about an edge in GT, eliminatory case for couple not in GT alreay in _EdgeRespect function.
-
+    #return 0
+    if label_edge_ij == 'B53' or label_edge_ij == 'artificialB53':
+        return 0
+    edges = [l for (i, j, l) in edges_target if (i == nodes_target[x]) and (j == nodes_target[y]) and (l != 'B53' or l != 'artificialB53')]
+    if len(edges) == 0:
+        return 0
+    return min([IDI_matrix[interaction_to_number(label_edge_ij)][interaction_to_number(e)] for e in edges])
 
 def _GapRespect(x, y, nodes_target, edges_target, GT, G):
     """
@@ -242,11 +220,14 @@ def _GapRespect(x, y, nodes_target, edges_target, GT, G):
             - A, the maximal sum of distances of gaps allowed in total.
     Output : A value between 0 and +inf that indicates the sum of all "false" edges (gaps) distances. Return +inf for eliminatory condition.
     """
-    if (nodes_target[x], nodes_target[y]) in edges_target: 
-        if GT[nodes_target[x]][nodes_target[y]]['correspondant_nodes'] != []: #This field is filled only ig it represents a gap.
+    #return 0 #seem OK
+    edges = [l for (i, j, l) in edges_target if (i == nodes_target[x]) and (j == nodes_target[y]) and (l == 'B53')]
+    if len(edges) > 0:
+        blub = [blub for blub in range(len(GT[nodes_target[x]][nodes_target[y]])) if GT[nodes_target[x]][nodes_target[y]][blub]['label'] == 'B53'][0]
+        if GT[nodes_target[x]][nodes_target[y]][blub]['correspondant_nodes'] != []: #This field is filled only ig it represents a gap.
             if G == 0: #If no gap allowed.
                 return infinite
-            return GT[nodes_target[x]][nodes_target[y]]['dist']
+            return GT[nodes_target[x]][nodes_target[y]][blub]['dist']
     return 0  
 
 
@@ -329,11 +310,12 @@ def main(GP, GT, L, E, G, maxGAPdistance=3, nb_samples=1000, respect_injectivity
             for j in range(len(IDI_matrix[0])):
                 IDI_matrix[i][j] = (IDI_matrix[i][j]- storage)
     #Intialisation.
+
     n_pattern = len(GP.nodes)
     n_target = len(GT.nodes)
 
     edges_pattern = list(GP.edges())
-    edges_target = list(GT.edges())
+    edges_target = [(i, j, t['label']) for (i,j,t) in GT.edges.data()]
 
     nodes_pattern = list(GP.nodes())
     nodes_target = list(GT.nodes())
@@ -359,7 +341,7 @@ def main(GP, GT, L, E, G, maxGAPdistance=3, nb_samples=1000, respect_injectivity
     model.add_functions([LabelRespect(nodes_pattern.index(i), nodes_pattern.index(j), label_edge_pattern[k], nodes_target, label_edge_target,  edges_target, IDI_matrix) for k, (i,j) in enumerate(edges_pattern)], 'LabelRespect')
 
     #We define Gap respect function on each edges in the pattern to check if we mapped "false edges" that represent gaps and we take into account the distance between nodes that they induced.
-    model.add_functions([GapRespect(nodes_pattern.index(i), nodes_pattern.index(j), nodes_target,  edges_target, GT, G) for k, (i,j) in enumerate(edges_pattern)], 'GapRespect')
+    model.add_functions([GapRespect(nodes_pattern.index(i), nodes_pattern.index(j), nodes_target,  edges_target, GT, G) for k, (i,j) in enumerate(edges_pattern) if label_edge_pattern[k] == 'B53'], 'GapRespect')
    
     #We now take some samples of results given the built model.
     sampler = ir.Sampler(model)

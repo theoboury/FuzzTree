@@ -6,8 +6,10 @@ import os
 import time
 import pickle
 import argparse
+import networkx as nx
 from FuzzTree import main
 from VarnaDrawing import print_mapping_on_target_graph
+from SliceInCubes import slicer
 
 
 DEBUG=0
@@ -20,6 +22,7 @@ def open_graph(graph_path):
     with open(graph_path,'rb') as f:
         G = pickle.load(f)
     return G
+
 
 
 def test_mapping(GPpath, GTpath, L, E, G, maxGAPdistance=3, nb_samples=1000, respect_injectivity=1, D = 5, Distancer_preprocessed = {}, nb_procs = 1):
@@ -65,9 +68,9 @@ def test_varna(name_file,GPpath, GTpath, show=1, output_format='png', L = 0, E =
     GP = open_graph(GPpath)
     GT = open_graph(GTpath)
     if mapping:
-        print_mapping_on_target_graph([], GT, mapping=mapping, output_format = output_format, name_file = name_file, show=show)
+        print_mapping_on_target_graph([], Gnew, mapping=mapping, output_format = output_format, name_file = name_file, show=show)
     else:
-        print_mapping_on_target_graph(GP, GT, mapping = [], output_format = output_format, name_file = name_file, show=show, L=L, E=E, G=G, maxGAPdistance=maxGAPdistance, nb_samples=nb_samples, respect_injectivity=respect_injectivity, D = D, Distancer_preprocessed = Distancer_preprocessed, nb_procs = nb_procs)
+        print_mapping_on_target_graph(GPnew, Gnew, mapping = [], output_format = output_format, name_file = name_file, show=show, L=L, E=E, G=G, maxGAPdistance=maxGAPdistance, nb_samples=nb_samples, respect_injectivity=respect_injectivity, D = D, Distancer_preprocessed = Distancer_preprocessed, nb_procs = nb_procs)
 
 parser = argparse.ArgumentParser()
 
@@ -82,6 +85,7 @@ parser.add_argument('--Dgap', type=str, required=False)
 parser.add_argument('--samples', type=str, required=False)
 parser.add_argument('--usevarna', type=str, required=False)
 parser.add_argument('--procs', type=str, required=False)
+parser.add_argument('--distancefile', type=str, required=False)
 args = parser.parse_args()
 
 pattern = args.pattern
@@ -98,6 +102,7 @@ Dedge = 5
 Dgap = 10
 nb_samples=1000
 nb_procs = 1
+Distancer_preprocessed = {}
 if args.L:
     L = int(args.L)
 if args.E:
@@ -112,14 +117,17 @@ if args.Dedge:
     Dedge = int(args.Dedge)
 if args.Dgap:
     Dgap = int(args.Dgap)
-
+if args.distancefile:
+    with open(args.distancefile,'rb') as f:
+        Distancer_preprocessed = pickle.load(f)
+        
 if args.usevarna:
-    test_varna("VarnaMapping", pattern, target, show=1, output_format="png",L=L, E=E, G=G, maxGAPdistance=Dgap, nb_samples=nb_samples, D = Dedge, nb_procs = nb_procs)
+    test_varna("VarnaMapping", pattern, target, show=1, output_format="png",L=L, E=E, G=G, maxGAPdistance=Dgap, nb_samples=nb_samples, D = Dedge, nb_procs = nb_procs, Distancer_preprocessed = Distancer_preprocessed)
     if os.path.isfile("VarnaMapping.png"):
         print("You can see VarnaMapping.png for the mapping drawn with Varna.")
     else:
         print("No drawing as output, Varna is probably not set up yet.")
     
 else:
-    mappings = test_mapping(pattern, target, L=L, E=E, G=G, maxGAPdistance=Dgap, nb_samples=nb_samples, D = Dedge, nb_procs = nb_procs)
+    mappings = test_mapping(pattern, target, L=L, E=E, G=G, maxGAPdistance=Dgap, nb_samples=nb_samples, D = Dedge, nb_procs = nb_procs, Distancer_preprocessed = Distancer_preprocessed)
     print("Found mappings", mappings)
